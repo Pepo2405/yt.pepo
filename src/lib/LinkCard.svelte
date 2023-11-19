@@ -1,10 +1,32 @@
 <script lang="ts">
+  import axios from "axios";
   import { quintOut } from "svelte/easing";
   import { scale } from "svelte/transition";
   import type { Format } from "../app.types";
   import { audioQualities } from "./utils";
   export let link: Format;
   export let i: number;
+  export let info: any;
+
+  const handleClick = async (url: any) => {
+    const backend = import.meta.env.VITE_BACKEND
+    const response = await axios.post(
+       backend + "/download/link",
+      {
+        title: info.title,
+        url: link.url,
+        container: link.container,
+        type: link.hasVideo ? 'video':"audio",
+      }
+    );
+    const anchor = document.createElement("a");
+    anchor.href = backend + "/download/file/"+ response.data.path;
+    // anchor.target = "_blank";
+    console.log(response.data);
+    console.log(anchor);
+    anchor.click();
+    document.removeChild(anchor)
+  };
 </script>
 
 <div
@@ -54,7 +76,7 @@
               class="text-base font-semibold leading-6 text-gray-900 capitalize"
               id="modal-title"
             >
-              {link.container}
+              {link.hasVideo ? link.container : 'Mp3'}
             </h3>
             <div class="">
               <p class="text-sm text-gray-500">
@@ -67,7 +89,7 @@
             </div>
           </div>
         </div>
-        <a href={link.url} target="_blank" class="button"> Descargar </a>
+        <button on:click={()=>handleClick(link.url)} class="button"> Descargar </button>
       </div>
       <div class="bg-gray-100 px-4 py-2 sm:flex sm:flex-row-reverse sm:px-6" />
     </div>

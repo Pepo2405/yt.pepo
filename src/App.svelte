@@ -28,9 +28,6 @@
       });
   };
 </script>
-<head>
-  <title>Amogus</title>
-</head>
 
 <main class="w-full min-h-screen flex flex-col justify-between h-full bg-slate-900 text-white">
   <div class="flex flex-grow flex-col justify-center px-6 py-12 lg:px-8">
@@ -109,7 +106,7 @@
 
       <div class="flex flex-col gap-2">
         {#each formats as link, i}
-          <LinkCard {link} {i} />
+          <LinkCard {link} {i} {info} />
         {/each}
       </div>
     </div>
