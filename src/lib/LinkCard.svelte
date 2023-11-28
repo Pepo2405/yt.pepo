@@ -4,28 +4,33 @@
   import { scale } from "svelte/transition";
   import type { Format } from "../app.types";
   import { audioQualities } from "./utils";
+  import Astronaut from "./Astronaut.svelte";
   export let link: Format;
   export let i: number;
   export let info: any;
+  export let toast: any;
+
+  let loading = false;
 
   const handleClick = async (url: any) => {
-    const backend = import.meta.env.VITE_BACKEND
-    const response = await axios.post(
-       backend + "/download/link",
-      {
+    loading = true;
+    const backend = import.meta.env.VITE_BACKEND;
+    try {
+      const response = await axios.post(backend + "/download/link", {
         title: info.title,
         url: link.url,
         container: link.container,
-        type: link.hasVideo ? 'video':"audio",
-      }
-    );
-    const anchor = document.createElement("a");
-    anchor.href = backend + "/download/file/"+ response.data.path;
-    // anchor.target = "_blank";
-    console.log(response.data);
-    console.log(anchor);
-    anchor.click();
-    document.removeChild(anchor)
+        type: link.hasVideo ? "video" : "audio",
+      });
+      loading = false;
+      const anchor = document.createElement("a");
+      anchor.href = backend + "/download/file/" + response.data.path;
+      // anchor.target = "_blank";
+      anchor.click();
+      document.removeChild(anchor);
+    } catch (error) {
+      toast.error("😥😭 Fallo la descarga! 😭😥");
+    }
   };
 </script>
 
@@ -76,7 +81,7 @@
               class="text-base font-semibold leading-6 text-gray-900 capitalize"
               id="modal-title"
             >
-              {link.hasVideo ? link.container : 'Mp3'}
+              {link.hasVideo ? link.container : "Mp3"}
             </h3>
             <div class="">
               <p class="text-sm text-gray-500">
@@ -89,7 +94,13 @@
             </div>
           </div>
         </div>
-        <button on:click={()=>handleClick(link.url)} class="button"> Descargar </button>
+        {#if loading}
+          <Astronaut />
+        {:else}
+          <button on:click={() => handleClick(link.url)} class="button">
+            Descargar
+          </button>
+        {/if}
       </div>
       <div class="bg-gray-100 px-4 py-2 sm:flex sm:flex-row-reverse sm:px-6" />
     </div>
